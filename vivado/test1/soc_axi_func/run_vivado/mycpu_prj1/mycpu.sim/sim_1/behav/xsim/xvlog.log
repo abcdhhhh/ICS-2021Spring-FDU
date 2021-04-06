@@ -1,0 +1,66 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/xilinx_ip/clk_pll/clk_pll_clk_wiz.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clk_pll_clk_wiz
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/xilinx_ip/clk_pll/clk_pll.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module clk_pll
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/xilinx_ip/axi_ram/sim/axi_ram.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axi_ram
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/xilinx_ip/axi_crossbar_1x2/sim/axi_crossbar_1x2.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axi_crossbar_1x2
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/xilinx_ip/axi_clock_converter/sim/axi_clock_converter.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axi_clock_converter
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/axi_wrap/axi_wrap.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axi_wrap
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/ram_wrap/axi_wrap_ram.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module axi_wrap_ram
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/CONFREG/confreg.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module confreg
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/rtl/soc_axi_lite_top.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module soc_axi_lite_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/util/CBusArbiter.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module CBusArbiter
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/util/CBusToAXI.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module CBusToAXI
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/ControlUnit.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ControlUnit
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/util/DBusToCBus.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module DBusToCBus
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/Din.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Din
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/Ein.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Ein
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/Fin.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Fin
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/util/IBusToCBus.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module IBusToCBus
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/Min.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Min
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/MyCore.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module MyCore
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/VTop.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module VTop
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/Win.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module Win
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/alu.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module alu
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/decode.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module decode
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/execute.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module execute
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/fetch.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module fetch
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/hazard.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module hazard
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/memory.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module memory
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/mycpu_top.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mycpu_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/regfile.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module regfile
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/selectpc.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module selectpc
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/source/mycpu/writeback.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module writeback
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/testbench/mycpu_tb.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_top
+INFO: [VRFC 10-2263] Analyzing Verilog file "/home/abcdhhhh/Desktop/ICS/ICS-2021Spring-FDU/vivado/test1/soc_axi_func/run_vivado/mycpu_prj1/mycpu.sim/sim_1/behav/xsim/glbl.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glbl

@@ -4,7 +4,7 @@
 /**
  * TODO (Lab2) comment out the following line :)
  */
-`define FIXED_LATENCY
+//`define FIXED_LATENCY
 
 module mycpu_top (
 `ifdef FIXED_LATENCY
@@ -81,8 +81,8 @@ module mycpu_top (
     /**
      * TODO (Lab1) connect debug ports :)
      */
-    assign debug_wb_pc       = '0;
-    assign debug_wb_rf_wen   = '0;
-    assign debug_wb_rf_wnum  = '0;
-    assign debug_wb_rf_wdata = '0;
+    assign debug_wb_pc       = top.core.writeback_inst.PCW;
+    assign debug_wb_rf_wen   = top.core.writeback_inst.RegWriteW ? 4'b1111 : 4'b0;
+    assign debug_wb_rf_wnum  = top.core.writeback_inst.WriteRegW;
+    assign debug_wb_rf_wdata = top.core.writeback_inst.ResultW;
 endmodule

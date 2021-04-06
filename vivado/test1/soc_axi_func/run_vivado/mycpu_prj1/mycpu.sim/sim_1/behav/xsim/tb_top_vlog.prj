@@ -1,0 +1,44 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  --include "../../../../../../../../../source/include" --include "../../../../../../../../../source/include/mycpu" --include "../../../../mycpu.ip_user_files/ipstatic/hdl" --include "../../../../../../rtl/xilinx_ip/clk_pll" \
+"../../../../../../rtl/xilinx_ip/clk_pll/clk_pll_clk_wiz.v" \
+"../../../../../../rtl/xilinx_ip/clk_pll/clk_pll.v" \
+"../../../../../../rtl/xilinx_ip/axi_ram/sim/axi_ram.v" \
+"../../../../../../rtl/xilinx_ip/axi_crossbar_1x2/sim/axi_crossbar_1x2.v" \
+"../../../../../../rtl/xilinx_ip/axi_clock_converter/sim/axi_clock_converter.v" \
+"../../../../../../rtl/axi_wrap/axi_wrap.v" \
+"../../../../../../rtl/ram_wrap/axi_wrap_ram.v" \
+"../../../../../../rtl/CONFREG/confreg.v" \
+"../../../../../../rtl/soc_axi_lite_top.v" \
+
+sv xil_defaultlib  --include "../../../../../../../../../source/include" --include "../../../../../../../../../source/include/mycpu" --include "../../../../mycpu.ip_user_files/ipstatic/hdl" --include "../../../../../../rtl/xilinx_ip/clk_pll" \
+"../../../../../../../../../source/util/CBusArbiter.sv" \
+"../../../../../../../../../source/util/CBusToAXI.sv" \
+"../../../../../../../../../source/mycpu/ControlUnit.sv" \
+"../../../../../../../../../source/util/DBusToCBus.sv" \
+"../../../../../../../../../source/mycpu/Din.sv" \
+"../../../../../../../../../source/mycpu/Ein.sv" \
+"../../../../../../../../../source/mycpu/Fin.sv" \
+"../../../../../../../../../source/util/IBusToCBus.sv" \
+"../../../../../../../../../source/mycpu/Min.sv" \
+"../../../../../../../../../source/mycpu/MyCore.sv" \
+"../../../../../../../../../source/mycpu/VTop.sv" \
+"../../../../../../../../../source/mycpu/Win.sv" \
+"../../../../../../../../../source/mycpu/alu.sv" \
+"../../../../../../../../../source/mycpu/decode.sv" \
+"../../../../../../../../../source/mycpu/execute.sv" \
+"../../../../../../../../../source/mycpu/fetch.sv" \
+"../../../../../../../../../source/mycpu/hazard.sv" \
+"../../../../../../../../../source/mycpu/memory.sv" \
+"../../../../../../../../../source/mycpu/mycpu_top.sv" \
+"../../../../../../../../../source/mycpu/regfile.sv" \
+"../../../../../../../../../source/mycpu/selectpc.sv" \
+"../../../../../../../../../source/mycpu/writeback.sv" \
+
+verilog xil_defaultlib  --include "../../../../../../../../../source/include" --include "../../../../../../../../../source/include/mycpu" --include "../../../../mycpu.ip_user_files/ipstatic/hdl" --include "../../../../../../rtl/xilinx_ip/clk_pll" \
+"../../../../../../testbench/mycpu_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
