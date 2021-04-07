@@ -17,7 +17,8 @@ module execute(
     /*Memory*/
     output word_t WriteDataE,
     /*ControlUnit*/
-    input logic RegWriteD, MemtoRegD, MemWriteD, ALUSrcD, RegDstD, LinkD,
+    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD,
+    input logic [1:0] ALUSrcD,
     input alu_t ALUControlD,
     output logic RegWriteE, MemtoRegE, MemWriteE,
     /*ALU*/
@@ -30,7 +31,8 @@ module execute(
     regidx_t RdE;
     word_t RsDE, RtDE;
     word_t SignImmE;
-    logic ALUSrcE, RegDstE, LinkE;
+    logic [1:0] ALUSrcE;
+    logic RegDstE, LinkE;
     alu_t ALUControlE;
     Ein Ein_inst(.*);
     /*WriteRegE*/
@@ -40,22 +42,20 @@ module execute(
     /*SrcA, WriteDataE, SrcB*/
     word_t SrcA, SrcB;
     always_comb begin
-        unique case(ForwardAE)
-            2'b01: SrcA=ResultW;
-            2'b10: SrcA=ALUOutM;
-            default: begin
-                unique case(ALUControlE)
-                    ALU_SLL, ALU_SRA, ALU_SRL: SrcA=RtDE;
-                    default: SrcA=RsDE;
-                endcase
-            end
-        endcase
+        if(ALUSrcE[0]) SrcA=SignImmE;
+        else begin
+            unique case(ForwardAE)
+                2'b01: SrcA=ResultW;
+                2'b10: SrcA=ALUOutM;
+                default: SrcA=RsDE;
+            endcase
+        end
         unique case(ForwardBE)
             2'b01: WriteDataE=ResultW;
             2'b10: WriteDataE=ALUOutM;
             default: WriteDataE=RtDE;
         endcase
-        SrcB=ALUSrcE ? SignImmE : WriteDataE;
+        SrcB=ALUSrcE[1] ? SignImmE : WriteDataE;
     end
     word_t ALUResult;
     alu alu_inst(.*);

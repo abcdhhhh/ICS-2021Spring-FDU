@@ -5,14 +5,16 @@ module Ein(
     input logic clk,resetn, StallE, FlushE,
     input addr_t PCD,
     input word_t SignImmD,
-    input logic RegWriteD, MemtoRegD, MemWriteD, ALUSrcD, RegDstD, LinkD,
+    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD,
+    input logic [1:0] ALUSrcD,
     input alu_t ALUControlD,
     input regidx_t RsD, RtD, RdD,
     input word_t RsDD, RtDD,
     
     output addr_t PCE,
     output word_t SignImmE,
-    output logic RegWriteE, MemtoRegE, MemWriteE, ALUSrcE, RegDstE, LinkE,
+    output logic RegWriteE, MemtoRegE, MemWriteE, RegDstE, LinkE,
+    output logic [1:0] ALUSrcE,
     output alu_t ALUControlE,
     output regidx_t RsE, RtE, RdE,
     output word_t RsDE, RtDE

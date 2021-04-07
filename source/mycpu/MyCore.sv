@@ -39,7 +39,8 @@ module MyCore (
     regidx_t WriteRegW;
     logic RegWriteW;
     word_t ResultW;
-    logic RegWriteD, MemtoRegD, MemWriteD, ALUSrcD, RegDstD, LinkD;
+    logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD;
+    logic [1:0] ALUSrcD;
     alu_t ALUControlD;
     word_t ALUOutE, ALUOutM;
     logic [1:0] ForwardAD, ForwardBD;
@@ -68,7 +69,7 @@ module MyCore (
     assign dreq.valid=d_validM;
     assign dreq.addr={3'b0,ALUOutM[28:0]};
     assign dreq.size=MSIZE4;
-    assign dreq.strobe=MemWriteM ? 4'b1111 : 4'b0;
+    assign dreq.strobe={4{MemWriteM}};
     assign dreq.data=DataM;
 
     logic StallW, FlushW;

@@ -8,9 +8,9 @@ module alu(
 );
     always_comb begin
         unique case(ALUControlE)
-            ALU_SLL: ALUResult=SrcA<<SrcB;
-            ALU_SRL: ALUResult=SrcA>>SrcB;
-            ALU_SRA: ALUResult=$signed(SrcA)>>>SrcB;
+            ALU_SLL: ALUResult=SrcB<<SrcA;
+            ALU_SRL: ALUResult=SrcB>>SrcA;
+            ALU_SRA: ALUResult=$signed(SrcB)>>>SrcA;
             ALU_ADDU: ALUResult=SrcA+SrcB;
             ALU_SUBU: ALUResult=SrcA-SrcB;
             ALU_AND: ALUResult=SrcA&SrcB;
