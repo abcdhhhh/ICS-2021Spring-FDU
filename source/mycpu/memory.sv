@@ -20,7 +20,11 @@ module memory(
     output word_t ALUOutM,
     /*ControlUnit*/
     input logic RegWriteE, MemtoRegE, MemWriteE,
+    input msize_t SizeE,
+    input logic SignedE,
     output logic RegWriteM, MemtoRegM, MemWriteM,
+    output msize_t SizeM,
+    output logic SignedM,
     output logic d_validM,
     /*Forward*/
     input logic ForwardM,

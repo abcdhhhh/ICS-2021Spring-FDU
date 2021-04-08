@@ -12,9 +12,11 @@ module ControlUnit(
     /*signal*/
     output addr_t PCBranchD,
     output logic PCSrcD,
-    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, 
+    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
     output logic [1:0] ALUSrcD,
-    output alu_t ALUControlD
+    output alu_t ALUControlD,
+    output msize_t SizeD,
+    output logic SignedD
 );
     /*instr structure*/
     logic [4:0] sa;
@@ -127,7 +129,7 @@ module ControlUnit(
             OP_BLEZ: PCSrcD=($signed(RsDD)<=0);
             OP_BGTZ: PCSrcD=($signed(RsDD)>0);
             OP_J, OP_JAL: PCSrcD='1;
-            OP_RTYPE: PCSrcD=(funct==FN_JR);
+            OP_RTYPE: PCSrcD=(funct==FN_JR || funct==FN_JALR);
             default: PCSrcD='0;
         endcase
     end
@@ -185,7 +187,17 @@ module ControlUnit(
         unique case(op)
             OP_BTYPE: LinkD=rt[4];
             OP_JAL: LinkD='1;
+            OP_RTYPE: LinkD=(funct==FN_JALR);
             default: LinkD='0;
+        endcase
+    end
+
+    /*RetD*/
+    always_comb begin
+        unique case(op)
+            OP_BTYPE: RetD=rt[4];
+            OP_JAL: RetD='1;
+            default: RetD='0;
         endcase
     end
 
@@ -218,6 +230,21 @@ module ControlUnit(
                 default: ALUControlD=ALU_ADDU;
             endcase
         end
+    end
+    /*Strobe*/
+    always_comb begin
+        unique case(op)
+            OP_LB, OP_LBU, OP_SB: SizeD=MSIZE1;
+            OP_LH, OP_LHU, OP_SH: SizeD=MSIZE2;
+            default: SizeD=MSIZE4;
+        endcase
+    end
+    /*Signed*/
+    always_comb begin
+        unique case(op)
+            OP_LBU, OP_LHU: SignedD='0;
+            default: SignedD='1;
+        endcase
     end
     logic _unused_ok = &{'0, instr};
 endmodule

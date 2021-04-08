@@ -17,10 +17,14 @@ module execute(
     /*Memory*/
     output word_t WriteDataE,
     /*ControlUnit*/
-    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD,
+    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
     input logic [1:0] ALUSrcD,
     input alu_t ALUControlD,
+    input msize_t SizeD,
+    input logic SignedD,
     output logic RegWriteE, MemtoRegE, MemWriteE,
+    output msize_t SizeE,
+    output logic SignedE,
     /*ALU*/
     output word_t ALUOutE,
     /*Forward*/
@@ -32,12 +36,12 @@ module execute(
     word_t RsDE, RtDE;
     word_t SignImmE;
     logic [1:0] ALUSrcE;
-    logic RegDstE, LinkE;
+    logic RegDstE, LinkE, RetE;
     alu_t ALUControlE;
     Ein Ein_inst(.*);
     /*WriteRegE*/
     always_comb begin
-        WriteRegE=RegDstE ? RdE : (LinkE ? 5'b11111 : RtE);
+        WriteRegE=RegDstE ? RdE : (RetE ? 5'b11111 : RtE);
     end
     /*SrcA, WriteDataE, SrcB*/
     word_t SrcA, SrcB;

@@ -39,7 +39,9 @@ module MyCore (
     regidx_t WriteRegW;
     logic RegWriteW;
     word_t ResultW;
-    logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD;
+    logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD;
+    msize_t SizeD;
+    logic SignedD;
     logic [1:0] ALUSrcD;
     alu_t ALUControlD;
     word_t ALUOutE, ALUOutM;
@@ -52,6 +54,8 @@ module MyCore (
     regidx_t WriteRegE;
     word_t WriteDataE;
     logic RegWriteE, MemtoRegE, MemWriteE;
+    msize_t SizeE;
+    logic SignedE;
     logic [1:0] ForwardAE, ForwardBE;
     execute execute_inst(.*);
 
@@ -60,6 +64,8 @@ module MyCore (
     regidx_t RtM;
     regidx_t WriteRegM;
     logic RegWriteM, MemtoRegM, MemWriteM;
+    msize_t SizeM;
+    logic SignedM;
     logic d_validM;
     logic ForwardM;
     memory memory_inst(.*);
@@ -68,9 +74,42 @@ module MyCore (
     word_t DataM;
     assign dreq.valid=d_validM;
     assign dreq.addr={3'b0,ALUOutM[28:0]};
-    assign dreq.size=MSIZE4;
-    assign dreq.strobe={4{MemWriteM}};
-    assign dreq.data=DataM;
+    assign dreq.size=SizeM;
+        /*strobe*/
+    always_comb begin
+        dreq.strobe=4'b0000;
+        if(MemWriteM) begin
+            unique case(SizeM)
+                MSIZE1: begin
+                    unique case(ALUOutM[1:0])
+                        2'b00: dreq.strobe=4'b0001;
+                        2'b01: dreq.strobe=4'b0010;
+                        2'b10: dreq.strobe=4'b0100;
+                        2'b11: dreq.strobe=4'b1000;
+                        default: dreq.strobe=4'b0001;
+                    endcase
+                end
+                MSIZE2: begin
+                    unique case(ALUOutM[1])
+                        1'b0: dreq.strobe=4'b0011;
+                        1'b1: dreq.strobe=4'b1100;
+                        default: dreq.strobe=4'b0011;
+                    endcase
+                end
+                default: dreq.strobe=4'b1111;
+            endcase
+        end
+    end
+        /*data*/
+    always_comb begin
+        unique case(ALUOutM[1:0])
+            2'b00: dreq.data=DataM;
+            2'b01: dreq.data=DataM<<32'h8;
+            2'b10: dreq.data=DataM<<32'h10;
+            2'b11: dreq.data=DataM<<32'h18;
+            default: dreq.data=DataM;
+        endcase
+    end
 
     logic StallW, FlushW;
     addr_t PCW;

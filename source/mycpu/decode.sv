@@ -16,11 +16,13 @@ module decode(
     input regidx_t WriteRegW,
     input logic RegWriteW,
     input word_t ResultW,
-    /*ControlUnit*/
+    /*signals*/
     output logic PCSrcD,
-    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD,
+    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
     output logic [1:0] ALUSrcD,
     output alu_t ALUControlD,
+    output msize_t SizeD,
+    output logic SignedD,
     /*Forward*/
     input word_t ALUOutM, ALUOutE,
     input logic [1:0] ForwardAD, ForwardBD
