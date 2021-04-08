@@ -9,28 +9,28 @@ auto MyCPU::get_writeback_pc() const -> addr_t {
     /**
      * TODO (Lab2) retrieve PC from verilated model :)
      */
-    return 0x19260817;
+    return VTop->core__DOT__writeback_inst__DOT__PCW;
 }
 
 auto MyCPU::get_writeback_id() const -> int {
     /**
      * TODO (Lab2) retrieve writeback register id from verilated model :)
      */
-    return 0;
+    return VTop->core__DOT__writeback_inst__DOT__WriteRegW;
 }
 
 auto MyCPU::get_writeback_value() const -> addr_t {
     /**
      * TODO (Lab2) retrieve writeback value from verilated model :)
      */
-    return 0xdeadbeef;
+    return VTop->core__DOT__writeback_inst__DOT__ResultW;
 }
 
 auto MyCPU::get_writeback_wen() const -> word_t {
     /**
      * TODO (Lab2) retrieve writeback wen from verilated model :)
      */
-    return get_writeback_id() != 0;
+    return VTop->core__DOT__writeback_inst__DOT__RegWriteW?0xf:0;
 }
 
 void MyCPU::print_status() {
