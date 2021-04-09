@@ -75,4 +75,12 @@ typedef enum{
     ALU_SLT,
     ALU_SLTU
 } alu_t;
+
+typedef enum{
+    MULT,
+    MULTU,
+    DIV,
+    DIVU,
+    CLR
+} mult_t;
 `endif

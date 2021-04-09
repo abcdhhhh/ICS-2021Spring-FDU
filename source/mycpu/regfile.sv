@@ -2,7 +2,7 @@
 `include"mycpu/type.svh"
 
 module regfile(
-    input logic clk,resetn,
+    input logic clk, resetn,
     input regidx_t ra1, ra2, wa3,
     input logic write_enable,
     input word_t wd3,

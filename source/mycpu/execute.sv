@@ -18,8 +18,10 @@ module execute(
     output word_t WriteDataE,
     /*ControlUnit*/
     input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
-    input logic [1:0] ALUSrcD,
+    input logic [1:0] ALUSrcAD,
+    input logic ALUSrcBD,
     input alu_t ALUControlD,
+    input mult_t MULTControlD,
     input msize_t SizeD,
     input logic SignedD,
     output logic RegWriteE, MemtoRegE, MemWriteE,
@@ -27,17 +29,26 @@ module execute(
     output logic SignedE,
     /*ALU*/
     output word_t ALUOutE,
+    /*MULT*/
+    output i32 HiDataE, LoDataE,
     /*Forward*/
     input word_t ALUOutM,
     input word_t ResultW,
-    input logic [1:0] ForwardAE, ForwardBE
+    input logic [1:0] ForwardAE, ForwardBE,
+    /*hilo*/
+    input i32 HiD, LoD,
+    input logic HiWriteD, LoWriteD,
+    output logic HiWriteE, LoWriteE
 );
     regidx_t RdE;
     word_t RsDE, RtDE;
     word_t SignImmE;
-    logic [1:0] ALUSrcE;
+    logic [1:0] ALUSrcAE;
+    logic ALUSrcBE;
     logic RegDstE, LinkE, RetE;
     alu_t ALUControlE;
+    mult_t MULTControlE;
+    i32 HiE, LoE;
     Ein Ein_inst(.*);
     /*WriteRegE*/
     always_comb begin
@@ -46,23 +57,36 @@ module execute(
     /*SrcA, WriteDataE, SrcB*/
     word_t SrcA, SrcB;
     always_comb begin
-        if(ALUSrcE[0]) SrcA=SignImmE;
-        else begin
-            unique case(ForwardAE)
-                2'b01: SrcA=ResultW;
-                2'b10: SrcA=ALUOutM;
-                default: SrcA=RsDE;
-            endcase
-        end
+        unique case(ALUSrcAE)
+            /*Rs*/
+            2'b00: begin
+                unique case(ForwardAE)
+                    2'b01: SrcA=ResultW;
+                    2'b10: SrcA=ALUOutM;
+                    default: SrcA=RsDE;
+                endcase
+            end
+            /*SignImm*/
+            2'b01: SrcA=SignImmE;
+            /*Hi*/
+            2'b10: SrcA=HiE;
+            /*Lo*/
+            2'b11: SrcA=LoE;
+        endcase
         unique case(ForwardBE)
             2'b01: WriteDataE=ResultW;
             2'b10: WriteDataE=ALUOutM;
             default: WriteDataE=RtDE;
         endcase
-        SrcB=ALUSrcE[1] ? SignImmE : WriteDataE;
+        SrcB=ALUSrcBE ? SignImmE : WriteDataE;
     end
     word_t ALUResult;
     alu alu_inst(.*);
+    i32 hi, lo;
+    mult mult_inst(.*);
+    /*hilo*/
+    assign HiDataE=(MULTControlE==CLR) ? RsDE : hi;
+    assign LoDataE=(MULTControlE==CLR) ? RsDE : lo;
     always_comb begin
         ALUOutE=LinkE ? PCE+32'b1000 : ALUResult;
     end

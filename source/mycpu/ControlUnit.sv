@@ -13,8 +13,11 @@ module ControlUnit(
     output addr_t PCBranchD,
     output logic PCSrcD,
     output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
-    output logic [1:0] ALUSrcD,
+    output logic HiWriteD, LoWriteD,
+    output logic [1:0] ALUSrcAD,
+    output logic ALUSrcBD,
     output alu_t ALUControlD,
+    output mult_t MULTControlD,
     output msize_t SizeD,
     output logic SignedD
 );
@@ -166,23 +169,33 @@ module ControlUnit(
         endcase
     end
 
-    /*ALUSrc*/
+    /*ALUSrcA*/
     always_comb begin
         unique case(op)
             OP_RTYPE: begin
                 unique case(funct)
-                    FN_SLL, FN_SRA, FN_SRL: ALUSrcD=2'b01;
-                    default: ALUSrcD='0;
+                    /*SignImm*/
+                    FN_SLL, FN_SRA, FN_SRL: ALUSrcAD=2'b01;
+                    /*Hi*/
+                    FN_MFHI: ALUSrcAD=2'b10;
+                    /*Lo*/
+                    FN_MFLO: ALUSrcAD=2'b11;
+                    /*Rs*/
+                    default: ALUSrcAD=2'b00;
                 endcase
             end
-            default: ALUSrcD=2'b10;
+            default: ALUSrcAD=2'b00;
         endcase
     end
+
+    /*ALUSrcB*/
+        /*RtD, SignImm*/
+    assign ALUSrcBD=(op!=OP_RTYPE);
 
     /*RegDst*/
     assign RegDstD=(op==OP_RTYPE);
 
-    /*LinkD*/
+    /*Link*/
     always_comb begin
         unique case(op)
             OP_BTYPE: LinkD=rt[4];
@@ -192,12 +205,37 @@ module ControlUnit(
         endcase
     end
 
-    /*RetD*/
+    /*Ret*/
     always_comb begin
         unique case(op)
             OP_BTYPE: RetD=rt[4];
             OP_JAL: RetD='1;
             default: RetD='0;
+        endcase
+    end
+
+    /*HiWrite*/
+    always_comb begin
+        unique case(op)
+            OP_RTYPE: begin
+                unique case(funct)
+                    FN_MTHI, FN_MULT, FN_MULTU, FN_DIV, FN_DIVU: HiWriteD='1;
+                    default: HiWriteD='0;
+                endcase
+            end
+            default: HiWriteD='0;
+        endcase
+    end
+    /*LoWrite*/
+    always_comb begin
+        unique case(op)
+            OP_RTYPE: begin
+                unique case(funct)
+                    FN_MTLO, FN_MULT, FN_MULTU, FN_DIV, FN_DIVU: LoWriteD='1;
+                    default: LoWriteD='0;
+                endcase
+            end
+            default: LoWriteD='0;
         endcase
     end
 
@@ -231,6 +269,21 @@ module ControlUnit(
             endcase
         end
     end
+
+    /*MULTControl*/
+    always_comb begin  
+        if(op==OP_RTYPE) begin
+            unique case(funct)
+                FN_MULT: MULTControlD=MULT;
+                FN_MULTU: MULTControlD=MULTU;
+                FN_DIV: MULTControlD=DIV;
+                FN_DIVU: MULTControlD=DIVU;
+                default: MULTControlD=CLR;
+            endcase
+        end
+        else MULTControlD=CLR;
+    end
+
     /*Strobe*/
     always_comb begin
         unique case(op)

@@ -42,10 +42,16 @@ module MyCore (
     logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD;
     msize_t SizeD;
     logic SignedD;
-    logic [1:0] ALUSrcD;
+    logic HiWriteD, LoWriteD;
+    logic [1:0] ALUSrcAD;
+    logic ALUSrcBD;
     alu_t ALUControlD;
+    mult_t MULTControlD;
     word_t ALUOutE, ALUOutM;
     logic [1:0] ForwardAD, ForwardBD;
+    logic HiWriteE, LoWriteE;
+    i32 HiDataE, LoDataE;
+    i32 HiD, LoD;
     decode decode_inst(.*);
 
     logic StallE, FlushE;
