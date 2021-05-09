@@ -55,12 +55,12 @@ module VTop (
         mux_icresp = '0;
 
         if (ireq.addr[31:29] == 3'b101) begin
-            mux_ireq[1] = ireq;
+            mux_ireq[1] = ipreq;
             iresp = mux_iresp[1];
             icreq = mux_icreq[1];
             mux_icresp[1] = icresp;
         end else begin
-            mux_ireq[0] = ireq;
+            mux_ireq[0] = ipreq;
             iresp = mux_iresp[0];
             icreq = mux_icreq[0];
             mux_icresp[0] = icresp;

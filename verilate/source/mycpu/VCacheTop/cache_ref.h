@@ -17,6 +17,13 @@ public:
     void check_memory();
 
 private:
+    word_t cache_data[1<<2][1<<2][1<<2];
+    struct meta_t{
+        word_t tag[1<<2];
+        bool valid[1<<2], dirty[1<<2];
+    }meta[1<<2];
+    
+    
     MyCache *top;
     VModelScope *scope;
 
