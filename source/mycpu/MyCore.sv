@@ -29,7 +29,7 @@ module MyCore (
 
     /*i_translator*/
     assign ireq.valid=i_validF;
-    assign ireq.addr={3'b0, PCF[28:0]};
+    assign ireq.addr=PCF;
 
     logic StallD,FlushD;
     addr_t PCD;
@@ -79,7 +79,7 @@ module MyCore (
     /*d_translator*/
     word_t DataM;
     assign dreq.valid=d_validM;
-    assign dreq.addr={3'b0,ALUOutM[28:0]};
+    assign dreq.addr=ALUOutM;
     assign dreq.size=SizeM;
         /*strobe*/
     always_comb begin

@@ -1,7 +1,7 @@
 VERILATOR = verilator
 GTKWAVE = gtkwave
 
-.PHONY: help clean
+.PHONY: help clean system-info dump-instructions
 
 help:
 	@echo 'Available commands:'
@@ -80,8 +80,10 @@ system-info:
 	-$(GTKWAVE) --version
 	-$(CXX) --version
 	-which g++
+	-g++ --version
 	-which g++-9
 	-which clang++
+	-clang++ --version
 	-which clang++-10
 	-ls /usr/share/verilator/include
 

@@ -1,8 +1,8 @@
 *.bin
 *.o
-*.coe
+# *.coe
 *.out
 
-Makefile
-linker.ld
-start.s
+# Makefile
+# linker.ld
+# start.s

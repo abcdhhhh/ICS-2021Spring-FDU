@@ -9,8 +9,9 @@ VINCLUDE = verilate/include
 VSOURCE = verilate/source
 
 CXX_BUILD = $(BUILD_ROOT)/$(TARGET)/obj#    # build/gcc/refcpu/VTop/obj
+CXX_ROOT = $(VSOURCE)/$(VROOT)
 
-CXX_TARGET_FILES := $(wildcard $(VSOURCE)/$(VROOT)/*.cpp)
+CXX_TARGET_FILES := $(wildcard $(CXX_ROOT)/*.cpp)
 CXX_FILES := \
 	$(wildcard $(VSOURCE)/*.cpp) \
 	$(CXX_TARGET_FILES) \
@@ -18,7 +19,9 @@ CXX_FILES := \
 	$(VERILATOR_ROOT)/verilated_fst_c.cpp
 	# $(VERILATOR_ROOT)/verilated_threads.cpp
 
-CXX_TARGET_HEADERS := $(wildcard $(VSOURCE)/$(VROOT)/*.h)
+CXX_TARGET_HEADERS := \
+	$(wildcard $(CXX_ROOT)/*.h) \
+	$(wildcard $(CXX_ROOT)/*.inl)
 CXX_HEADERS := \
 	$(wildcard $(VINCLUDE)/*.h) \
 	$(wildcard $(VINCLUDE)/thirdparty/*.h)
@@ -30,7 +33,7 @@ CXX_LIBS := $(addprefix $(CXX_BUILD)/, $(CXX_FILES:%.cpp=%.o))
 CXX_INCLUDES = \
 	-I$(SV_BUILD) \
 	-I$(VINCLUDE) \
-	-I$(VSOURCE)/$(VROOT) \
+	-I$(CXX_ROOT) \
 	-I$(VERILATOR_ROOT) \
 	-I$(VERILATOR_ROOT)/vltstd/
 
@@ -77,6 +80,9 @@ $(CXX_LIBS): $(CXX_BUILD)/%.o : %.cpp $(CXX_HEADERS)
 	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) $< -c -o $@
 
+# add customed dependencies.
+-include $(CXX_ROOT)/Makefile.deps.mk
+
 $(VLIBRARY): $(SV_READY) $(SV_FILES)
 	cd $(SV_BUILD); $(MAKE) -f $(notdir $(SV_MKFILE)) CXX=$(CXX)
 	@touch $@
@@ -97,19 +103,23 @@ TEST_STD_FILE = misc/std/$(TEST).txt
 override VSIM_ARGS += -m $(TEST_COE_FILE)
 
 ifneq ($(wildcard $(TEST_REF_FILE)),)
+
 override VSIM_ARGS += -r $(TEST_REF_FILE)
+
 else ifneq ($(wildcard $(TEST_STD_FILE)),)
 
 # only add std trace for RefCPU
 ifeq ($(TARGET), refcpu/VTop)
 override VSIM_ARGS += -r $(TEST_STD_FILE) --force-diff
-endif
+endif  # ifeq
 
-else
-override VSIM_ARGS += -r ''
-endif
+# else
 
-endif
+# override VSIM_ARGS += -r ''
+
+endif  # ifneq
+
+endif  # ifneq ($(TEST),)
 
 ifneq ($(FST),)
 override VSIM_ARGS += -f $(FST)

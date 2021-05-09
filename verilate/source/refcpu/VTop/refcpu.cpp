@@ -3,7 +3,8 @@
 #include "refcpu.h"
 
 constexpr int MAX_CYCLE = 100000000;
-constexpr addr_t TEST_END_PC = 0xbfc00100;
+constexpr addr_t TEST_END_PC = 0x9fc00100;
+constexpr addr_t TEST_END_PC_MASK = 0xdfffffff;
 
 void RefCPU::print_status() {
     auto ctx = get_ctx();
@@ -19,7 +20,7 @@ void RefCPU::print_status() {
 void RefCPU::print_request() {
     auto req = get_oreq();
     if (resetn && req.valid()) {
-        debug(
+        log_debug(
             BLUE "[%s]" RESET " "
             "addr=%08x, data=%08x, len=%u, size=%u, strb=%x\n",
             req.is_write() ? "W" : "R",
@@ -40,7 +41,7 @@ void RefCPU::print_writeback() {
         auto value = ctx.r(id);
         text_dump(con->trace_enabled(), ctx.pc(), id, value);
 
-        // debug("R[%d \"%s\"] <- %08x\n",
+        // log_debug("R[%d \"%s\"] <- %08x\n",
         //     id, nameof::nameof_enum(id).data(), value);
     }
 }
@@ -130,7 +131,7 @@ void RefCPU::tick() {
     checkout_confreg();
 
     // check for the end of tests
-    if (get_ctx().pc() == TEST_END_PC + 4 ||
+    if ((get_ctx().pc() & TEST_END_PC_MASK) == TEST_END_PC + 4 ||
         (con->has_char() && con->get_char() == 0xff))
         test_finished = true;
 }
