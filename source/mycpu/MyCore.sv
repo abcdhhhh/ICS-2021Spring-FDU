@@ -1,5 +1,4 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module MyCore (
     input logic clk, resetn,
@@ -7,7 +6,9 @@ module MyCore (
     output ibus_req_t  ireq,
     input  ibus_resp_t iresp,
     output dbus_req_t  dreq,
-    input  dbus_resp_t dresp
+    input  dbus_resp_t dresp,
+
+    input i6 ext_int
 );
     /**
      * TODO (Lab1) your code here :)
@@ -17,67 +18,119 @@ module MyCore (
     assign i_data_ok=~ireq.valid|iresp.data_ok;
     assign d_data_ok=~dreq.valid|dresp.data_ok;
 
+    /*PC*/
+    addr_t PC0, PCF, PCD, PCE, PCM, PCW;
+    addr_t PCPlus4F;
+    addr_t PCBranchD;
     logic PCSrcD;
-    addr_t PCPlus4F, PCBranchD;
-    addr_t PC0;
-    selectpc selectpc_inst(.*);
 
-    logic StallF,FlushF;
-    addr_t PCF;
-    logic i_validF;
+    /*BD*/
+    logic BDD, BDE;
+
+    /*Stall*/
+    logic StallF, StallD, StallE, StallM, StallW;
+    /*Flush*/
+    logic FlushF, FlushD, FlushE, FlushM, FlushW;
+
+    /*d_valid*/
+    logic d_validM;
+
+    /*SignImm*/
+    word_t SignImmD;
+    /*RsD*/
+    word_t RsDD;
+    word_t RtDD, RtDE;
+
+    /*Rs*/
+    regidx_t RsD, RsE;
+    /*Rt*/
+    regidx_t RtD, RtE, RtM;
+    /*Rd*/
+    regidx_t RdD, RdE;
+    /*RegDst*/
+    logic RegDstD;
+    /*WriteReg*/
+    regidx_t WriteRegE, WriteRegM, WriteRegW;
+    /*RegWrite*/
+    logic RegWriteD, RegWriteE, RegWriteM, RegWriteW;
+
+    /*MemtoReg*/
+    logic MemtoRegD, MemtoRegE, MemtoRegM;    
+    /*MemWrite*/
+    logic MemWriteD, MemWriteE, MemWriteM;
+
+    /*Hi, Lo*/
+    word_t HiD, LoD;
+    /*HiData, LoData*/
+    word_t HiDataE, LoDataE;
+    /*HiWrite*/
+    logic HiWriteD, HiWriteE;
+    /*LoWrite*/
+    logic LoWriteD, LoWriteE;
+
+    /*CP0Write*/
+    logic CP0WriteD, CP0WriteE;
+    /*CP0D*/
+    word_t CP0DD;
+    /*interrupt_info*/
+    i8 interrupt_info;
+    /*epc*/
+    addr_t epc;
+
+    /*ALU*/
+    logic [1:0] ALUSrcAD, ALUSrcBD;
+    alu_t ALUControlD;
+    word_t ALUOutE, ALUOutM;
+    /*MULT*/
+    mult_t MULTControlD;
+    logic done, willmult;
+
+    /*WriteData*/
+    word_t WriteDataE;
+    /*Data*/
+    word_t DataM;
+
+    /*Result*/
+    word_t ResultW;
+
+    /*Link, Ret*/
+    logic LinkD, RetD;
+    
+    /*Size*/
+    msize_t SizeD, SizeE, SizeM;
+    /*Signed*/
+    logic SignedD, SignedE, SignedM;
+
+    /*Forward*/
+    logic [1:0] ForwardAD, ForwardBD;
+    logic [1:0] ForwardAE, ForwardBE;
+    logic ForwardM;
+
+    /*BadVAddr*/
+    addr_t BadVAddrE;
+
+    /*Eret*/
+    logic EretD, EretE;
+
+    /*EVector*/
+    i8 EVectorF, EVectorD;
+
+    ecode_t ecode;
+    logic exception_enable;
+
+    logic ex_or_eret;
+    
+    selectpc selectpc_inst(.*);
     fetch fetch_inst(.*);
+    decode decode_inst(.*);
+    execute execute_inst(.*);
+    memory memory_inst(.*);
+    writeback writeback_inst(.*);
+    hazard hazard_inst(.*);
 
     /*i_translator*/
-    assign ireq.valid=i_validF;
-    assign ireq.addr=PCF;
-
-    logic StallD,FlushD;
-    addr_t PCD;
-    word_t SignImmD;
-    regidx_t RsD, RtD, RdD;
-    word_t RsDD, RtDD;
-    regidx_t WriteRegW;
-    logic RegWriteW;
-    word_t ResultW;
-    logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD;
-    msize_t SizeD;
-    logic SignedD;
-    logic HiWriteD, LoWriteD;
-    logic [1:0] ALUSrcAD;
-    logic ALUSrcBD;
-    alu_t ALUControlD;
-    mult_t MULTControlD;
-    word_t ALUOutE, ALUOutM;
-    logic [1:0] ForwardAD, ForwardBD;
-    logic HiWriteE, LoWriteE;
-    i32 HiDataE, LoDataE;
-    i32 HiD, LoD;
-    decode decode_inst(.*);
-
-    logic StallE, FlushE;
-    addr_t PCE;
-    regidx_t RsE, RtE;
-    regidx_t WriteRegE;
-    word_t WriteDataE;
-    logic RegWriteE, MemtoRegE, MemWriteE;
-    msize_t SizeE;
-    logic SignedE;
-    logic [1:0] ForwardAE, ForwardBE;
-    execute execute_inst(.*);
-
-    logic StallM, FlushM;
-    addr_t PCM;
-    regidx_t RtM;
-    regidx_t WriteRegM;
-    logic RegWriteM, MemtoRegM, MemWriteM;
-    msize_t SizeM;
-    logic SignedM;
-    logic d_validM;
-    logic ForwardM;
-    memory memory_inst(.*);
-
+    
     /*d_translator*/
-    word_t DataM;
     assign dreq.valid=d_validM;
     assign dreq.addr=ALUOutM;
     assign dreq.size=SizeM;
@@ -102,6 +155,7 @@ module MyCore (
                         default: dreq.strobe=4'b0011;
                     endcase
                 end
+                MSIZE4: dreq.strobe=4'b1111;
                 default: dreq.strobe=4'b1111;
             endcase
         end
@@ -116,12 +170,6 @@ module MyCore (
             default: dreq.data=DataM;
         endcase
     end
-
-    logic StallW, FlushW;
-    addr_t PCW;
-    writeback writeback_inst(.*);
-
-    hazard hazard_inst(.*);
 
     logic _unused_ok=&{1'b0, ireq, iresp, dreq, dresp, PCW};
 /*

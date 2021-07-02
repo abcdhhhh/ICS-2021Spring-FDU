@@ -1,40 +1,65 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module Ein(
     input logic clk,resetn, StallE, FlushE,
+    /*PC*/
     input addr_t PCD,
-    input word_t SignImmD,
-    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
-    input logic [1:0] ALUSrcAD,
-    input logic ALUSrcBD,
-    input alu_t ALUControlD,
-    input mult_t MULTControlD,
-    input msize_t SizeD,
-    input logic SignedD,
-    input regidx_t RsD, RtD, RdD,
-    input word_t RsDD, RtDD,
-    input logic HiWriteD, LoWriteD,
-    input i32 HiD, LoD,
-    
     output addr_t PCE,
+
+    /*BD*/
+    input logic BDD,
+    output logic BDE,
+
+    /*SignImm*/
+    input word_t SignImmD,
     output word_t SignImmE,
-    output logic RegWriteE, MemtoRegE, MemWriteE, RegDstE, LinkE, RetE,
-    output logic [1:0] ALUSrcAE,
-    output logic ALUSrcBE,
+
+    //signals
+    input logic RegWriteD, MemtoRegD, MemWriteD, RegDstD,
+    output logic RegWriteE, MemtoRegE, MemWriteE, RegDstE,
+    input logic LinkD, RetD,
+    output logic LinkE, RetE,
+    input logic [1:0] ALUSrcAD, ALUSrcBD,
+    output logic [1:0] ALUSrcAE, ALUSrcBE,
+    input alu_t ALUControlD,
     output alu_t ALUControlE,
+    input mult_t MULTControlD,
     output mult_t MULTControlE,
+    input msize_t SizeD,
     output msize_t SizeE,
+    input logic SignedD,
     output logic SignedE,
+
+    //regfile
+    input regidx_t RsD, RtD, RdD,
     output regidx_t RsE, RtE, RdE,
+    input word_t RsDD, RtDD,
     output word_t RsDE, RtDE,
+
+    //hilo
+    input logic HiWriteD, LoWriteD,
     output logic HiWriteE, LoWriteE,
-    output i32 HiE, LoE
+    input i32 HiD, LoD,
+    output i32 HiE, LoE,
+
+    /*Eret*/
+    input logic EretD,
+    output logic EretE,
+    
+    //cp0
+    input logic CP0WriteD,
+    output logic CP0WriteE,
+    input word_t CP0DD,
+    output word_t CP0DE,
+
+    //exceptions
+    input i8 EVectorD,
+    output i8 EVectorEin
 );
     
     always_ff @(posedge clk) begin
         if(~resetn|FlushE) begin
-            PCE<=32'hbfc00000;
+            PCE<='0;
             SignImmE<='0;
             RegWriteE<='0;
             MemtoRegE<='0;
@@ -57,6 +82,11 @@ module Ein(
             LoWriteE<='0;
             HiE<='0;
             LoE<='0;
+            BDE <= '0;
+            EretE <= '0;
+            CP0WriteE <= '0;
+            CP0DE <= '0;
+            EVectorEin <= '0;
         end
         else if(~StallE) begin
             PCE<=PCD;
@@ -82,6 +112,11 @@ module Ein(
             LoWriteE<=LoWriteD;
             HiE<=HiD;
             LoE<=LoD;
+            BDE <= BDD;
+            EretE <= EretD;
+            CP0WriteE <= CP0WriteD;
+            CP0DE <= CP0DD;
+            EVectorEin <= EVectorD;
         end
     end
 endmodule

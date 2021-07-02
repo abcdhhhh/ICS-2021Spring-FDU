@@ -1,26 +1,30 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module Min(
     input logic clk,resetn, StallM, FlushM,
+    /*PC*/
     input addr_t PCE,
-    input logic RegWriteE, MemtoRegE, MemWriteE,
-    input msize_t SizeE,
-    input logic SignedE,
-    input word_t ALUOutE, WriteDataE,
-    input regidx_t WriteRegE,
-    input regidx_t RtE,
     output addr_t PCM,
+    //signals
+    input logic RegWriteE, MemtoRegE, MemWriteE,
     output logic RegWriteM, MemtoRegM, MemWriteM,
+    input msize_t SizeE,
     output msize_t SizeM,
+    input logic SignedE,
     output logic SignedM,
+    /*ALUOut, WriteData*/
+    input word_t ALUOutE, WriteDataE,
     output word_t ALUOutM, WriteDataM,
+    /*WriteReg*/
+    input regidx_t WriteRegE,
     output regidx_t WriteRegM,
+    /*Rt*/
+    input regidx_t RtE,  
     output regidx_t RtM
 );
     always_ff @(posedge clk) begin
         if(~resetn|FlushM) begin
-            PCM<=32'hbfc00000;
+            PCM<='0;
             RegWriteM<='0;
             MemtoRegM<='0;
             MemWriteM<='0;

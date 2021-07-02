@@ -1,5 +1,4 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module regfile(
     input logic clk, resetn,

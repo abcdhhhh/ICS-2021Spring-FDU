@@ -1,5 +1,4 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module ControlUnit(
     input ibus_resp_t instr,
@@ -9,17 +8,26 @@ module ControlUnit(
     /*instr structure*/
     output regidx_t rs, rt, rd,
     output word_t SignImmD,
-    /*signal*/
+    //signals
     output addr_t PCBranchD,
     output logic PCSrcD,
-    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD, LinkD, RetD,
+    output logic BDF,
+    output logic RegWriteD, MemtoRegD, MemWriteD, RegDstD,
+    output logic LinkD, RetD,
     output logic HiWriteD, LoWriteD,
-    output logic [1:0] ALUSrcAD,
-    output logic ALUSrcBD,
+    output logic [1:0] ALUSrcAD, ALUSrcBD,
     output alu_t ALUControlD,
     output mult_t MULTControlD,
+    output logic willmult,
     output msize_t SizeD,
-    output logic SignedD
+    output logic SignedD,
+
+    //exceptions
+    output logic Break, Syscall, Reserved,
+
+    // COP0
+    output logic CP0WriteD,
+    output logic EretD
 );
     /*instr structure*/
     logic [4:0] sa;
@@ -33,8 +41,11 @@ module ControlUnit(
     assign sa=instr.data[10:6];
     assign instr_index=instr.data[25:0];
     assign imm=instr.data[15:0];
-        /*op*/
+
+    // Reserved, op, funct        
     always_comb begin
+        Reserved='0;
+        /*op*/
         unique case(instr.data[31:26])
             6'b000000: op=OP_RTYPE;
             6'b000001: op=OP_BTYPE;
@@ -61,11 +72,12 @@ module ControlUnit(
             6'b101000: op=OP_SB;
             6'b101001: op=OP_SH;
             6'b101011: op=OP_SW;
-            default: op=OP_RTYPE;
+            default: begin
+                op=OP_RTYPE;
+                Reserved='1;
+            end
         endcase
-    end
         /*funct*/
-    always_comb begin
         unique case(instr.data[5:0])
             6'b000000: funct=FN_SLL;
             6'b000010: funct=FN_SRL;
@@ -95,7 +107,66 @@ module ControlUnit(
             6'b100111: funct=FN_NOR;
             6'b101010: funct=FN_SLT;
             6'b101011: funct=FN_SLTU;
-            default: funct=FN_SLL;
+            default: begin
+                funct=FN_SLL;
+                if(op==OP_RTYPE) Reserved='1;
+            end
+        endcase
+        unique case(op)
+            OP_RTYPE: begin
+                unique case(funct)
+                    // rs
+                    FN_SLL, FN_SRL, FN_SRA: begin
+                        if(rs != 5'b0) Reserved = '1;
+                    end
+                    // rt
+                    FN_JALR: begin
+                        if(rt != 5'b0) Reserved = '1;
+                    end
+                    // rt+rd
+                    FN_JR: begin
+                        if({rt,rd} != 10'b0) Reserved = '1;
+                    end
+                    // sa
+                    FN_SLLV, FN_SRLV, FN_SRAV, FN_ADD, FN_ADDU, FN_SUB, FN_SUBU, FN_AND, FN_OR, FN_XOR, FN_NOR, FN_SLT, FN_SLTU: begin
+                        if(sa != 5'b0) Reserved = '1;
+                    end
+                    // rs+rt+sa
+                    FN_MFHI, FN_MFLO: begin
+                        if({rs,rt,sa} != 15'b0) Reserved = '1;
+                    end
+                    // rt+rd+sa
+                    FN_MTHI, FN_MTLO: begin
+                        if({rt,rd,sa} != 15'b0) Reserved = '1;
+                    end
+                    // rd+sa
+                    FN_MULT, FN_MULTU, FN_DIV, FN_DIVU: begin
+                        if({rd,sa} != 10'b0) Reserved = '1;
+                    end
+                    default: ;
+                endcase
+            end
+            OP_BTYPE: begin
+                if(rt[3:1] != 3'b0) Reserved = '1;
+            end
+            OP_COP0: begin
+                unique case(rs)
+                    5'b00000, 5'b00100: begin
+                        if(instr.data[10:3] != 8'b0) Reserved = '1;
+                    end
+                    5'b10000: begin
+                        if(instr.data[20:0] != 21'b11000) Reserved = '1;
+                    end
+                    default: Reserved = '1;
+                endcase
+            end
+            OP_BLEZ, OP_BGTZ: begin
+                if(rt != 5'b0) Reserved = '1;
+            end
+            OP_LUI: begin
+                if(rs != 5'b0) Reserved = '1;
+            end
+            default: ;
         endcase
     end
 
@@ -137,6 +208,15 @@ module ControlUnit(
         endcase
     end
 
+    /*BD(F)*/
+    always_comb begin
+        unique case(op)
+            OP_BTYPE, OP_BEQ, OP_BNE, OP_BLEZ, OP_BGTZ, OP_J, OP_JAL: BDF = '1;
+            OP_RTYPE: BDF = (funct==FN_JR || funct==FN_JALR);
+            default: BDF = '0;
+        endcase
+    end
+
     /*RegWrite*/
     always_comb begin
         unique case(op)
@@ -147,7 +227,9 @@ module ControlUnit(
             /*not write*/
             OP_J, OP_BEQ, OP_BNE, OP_BLEZ, OP_BGTZ, OP_SB, OP_SH, OP_SW: RegWriteD='0;
             /*rd*/
-            OP_RTYPE: RegWriteD=(rd!=5'b0);
+            OP_RTYPE: RegWriteD = (funct!=FN_BREAK && funct!=FN_SYSCALL && rd!=5'b0);
+            /*COP0*/
+            OP_COP0: RegWriteD = (rs == 5'b0);
             /*rt*/
             default: RegWriteD=(rt!=5'b0);
         endcase
@@ -184,13 +266,22 @@ module ControlUnit(
                     default: ALUSrcAD=2'b00;
                 endcase
             end
+            /*Rs*/
             default: ALUSrcAD=2'b00;
         endcase
     end
 
     /*ALUSrcB*/
-        /*RtD, SignImm*/
-    assign ALUSrcBD=(op!=OP_RTYPE);
+    always_comb begin
+        unique case(op)
+            /*WriteData(RtD)*/
+            OP_RTYPE: ALUSrcBD = 2'b00;
+            /*CP0D*/
+            OP_COP0: ALUSrcBD = 2'b01;
+            /*SignImm*/
+            default: ALUSrcBD = 2'b10;
+        endcase
+    end
 
     /*RegDst*/
     assign RegDstD=(op==OP_RTYPE);
@@ -246,7 +337,9 @@ module ControlUnit(
                 FN_SLL, FN_SLLV: ALUControlD=ALU_SLL;
                 FN_SRL, FN_SRLV: ALUControlD=ALU_SRL;
                 FN_SRA, FN_SRAV: ALUControlD=ALU_SRA;
+                FN_ADD: ALUControlD=ALU_ADD;
                 FN_ADDU: ALUControlD=ALU_ADDU;
+                FN_SUB: ALUControlD=ALU_SUB;
                 FN_SUBU: ALUControlD=ALU_SUBU;
                 FN_AND: ALUControlD=ALU_AND;
                 FN_OR: ALUControlD=ALU_OR;
@@ -259,6 +352,7 @@ module ControlUnit(
         end
         else begin
             unique case(op)
+                OP_ADDI: ALUControlD=ALU_ADD;
                 OP_ADDIU: ALUControlD=ALU_ADDU;
                 OP_SLTI: ALUControlD=ALU_SLT;
                 OP_SLTIU: ALUControlD=ALU_SLTU;
@@ -272,13 +366,18 @@ module ControlUnit(
 
     /*MULTControl*/
     always_comb begin  
+        willmult = '0;
         if(op==OP_RTYPE) begin
+            willmult = '1;
             unique case(funct)
                 FN_MULT: MULTControlD=MULT;
                 FN_MULTU: MULTControlD=MULTU;
                 FN_DIV: MULTControlD=DIV;
                 FN_DIVU: MULTControlD=DIVU;
-                default: MULTControlD=CLR;
+                default: begin
+                    MULTControlD=CLR;
+                    willmult = '0;
+                end
             endcase
         end
         else MULTControlD=CLR;
@@ -299,5 +398,16 @@ module ControlUnit(
             default: SignedD='1;
         endcase
     end
+
+    //exceptions
+    assign Break = (instr.data[31:26]==6'b0 && funct==FN_BREAK);
+    assign Syscall = (instr.data[31:26]==6'b0 && funct==FN_SYSCALL);
+
+    /*CP0Write*/
+    assign CP0WriteD = (op == OP_COP0 && rs==5'b00100);
+
+    /*EretD*/
+    assign EretD = (op == OP_COP0 && rs==5'b10000);
+
     logic _unused_ok = &{'0, instr};
 endmodule

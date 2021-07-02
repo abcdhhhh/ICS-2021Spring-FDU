@@ -1,35 +1,50 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module mult (
+    input logic clk, resetn,
     input i32 SrcA, SrcB,
     input mult_t MULTControlE,
-    output i32 hi, lo
+    output i32 hi, lo,
+    output logic done
 );
-    i64 ans;
+    logic mult_valid, div_valid;
+    i32 a, b;
+    logic mult_done, div_done;
+    i64 mult_c, div_c;
+    multmult multmult_inst(.clk, .resetn, .valid(mult_valid), .a, .b, .done(mult_done), .c(mult_c));
+    multdiv multdiv_inst(.clk, .resetn, .valid(div_valid), .a, .b, .done(div_done), .c(div_c));
     always_comb begin
+        {mult_valid, div_valid, hi, lo} = '0;
+        done = '1;
         case (MULTControlE)
             MULTU: begin
-                ans = {32'b0, SrcA} * {32'b0, SrcB};
-                hi = ans[63:32]; lo = ans[31:0];
+                mult_valid = '1;
+                a = SrcA; b = SrcB;
+                {hi, lo} = mult_c;
+                done = mult_done;
             end
             MULT: begin
-                ans = signed'({{32{SrcA[31]}}, SrcA}) * signed'({{32{SrcB[31]}}, SrcB});
-                hi = ans[63:32]; lo = ans[31:0];
+                mult_valid = '1;
+                a = SrcA[31] ? -SrcA : SrcA; 
+                b = SrcB[31] ? -SrcB : SrcB; 
+                {hi, lo} = (SrcA[31]^SrcB[31]) ? -mult_c : mult_c;
+                done = mult_done;
             end
             DIVU: begin
-                ans = '0;
-                lo = SrcA/SrcB;
-                hi = SrcA%SrcB;
+                div_valid = '1;
+                a = SrcA; b = SrcB;
+                {hi, lo} = div_c;
+                done = div_done;
             end
             DIV: begin
-                ans = '0;
-                lo = signed'(SrcA) / signed'(SrcB);
-                hi = signed'(SrcA) % signed'(SrcB);
+                div_valid = '1;
+                a = SrcA[31] ? -SrcA : SrcA; 
+                b = SrcB[31] ? -SrcB : SrcB; 
+                hi = SrcA[31] ? -div_c[63:32] : div_c[63:32];
+                lo = (SrcA[31]^SrcB[31]) ? -div_c[31:0] : div_c[31:0];
+                done = div_done;
             end
-            default: begin
-                {hi, lo, ans} = '0;
-            end
+            default: ;
         endcase
     end
 endmodule

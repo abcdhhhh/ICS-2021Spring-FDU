@@ -1,8 +1,7 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module hilo (
-    input logic clk,
+    input logic clk, resetn,
     output i32 hi, lo,
     input i1 hi_write, lo_write,
     input i32 hi_data, lo_data
@@ -18,6 +17,11 @@ module hilo (
         end
     end
     always_ff @(posedge clk) begin
-        {hi, lo} <= {hi_new, lo_new};
+        if(~resetn) begin
+            {hi, lo} <= '0;
+        end 
+        else begin
+            {hi, lo} <= {hi_new, lo_new};
+        end
     end
 endmodule

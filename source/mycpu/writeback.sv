@@ -1,5 +1,4 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 
 module writeback(
@@ -14,7 +13,8 @@ module writeback(
     output word_t ResultW /* verilator public_flat_rd */,
     input regidx_t WriteRegM,
     output regidx_t WriteRegW /* verilator public_flat_rd */,
-    /*ControlUnit*/
+
+    //signals
     input logic RegWriteM, MemtoRegM,
     input msize_t SizeM,
     input logic SignedM,

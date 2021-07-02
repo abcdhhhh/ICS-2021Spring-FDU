@@ -1,31 +1,34 @@
-`include"common.svh"
-`include"mycpu/type.svh"
+`include"mycpu/defs.svh"
 
 module memory(
     input logic clk,resetn,StallM, FlushM,
     /*PC*/
     input addr_t PCE, 
     output addr_t PCM,
-    /*req*/
+    /*Data*/
     output word_t DataM,
-    /*reg*/
+    /*Rt*/
     input regidx_t RtE,
     output regidx_t RtM,
-    /*Write*/
-    input word_t WriteDataE,
-    input regidx_t WriteRegE,
-    output regidx_t WriteRegM,
-    /*ALU*/
+    /*ALUOut*/
     input word_t ALUOutE,
     output word_t ALUOutM,
-    /*ControlUnit*/
-    input logic RegWriteE, MemtoRegE, MemWriteE,
-    input msize_t SizeE,
-    input logic SignedE,
-    output logic RegWriteM, MemtoRegM, MemWriteM,
-    output msize_t SizeM,
-    output logic SignedM,
+    /*WriteData*/
+    input word_t WriteDataE,
+    /*WriteReg*/
+    input regidx_t WriteRegE,
+    output regidx_t WriteRegM, 
+    /*d_valid*/
     output logic d_validM,
+
+    //signals
+    input logic RegWriteE, MemtoRegE, MemWriteE,
+    output logic RegWriteM, MemtoRegM, MemWriteM,
+    input msize_t SizeE,
+    output msize_t SizeM,
+    input logic SignedE, 
+    output logic SignedM,
+
     /*Forward*/
     input logic ForwardM,
     input word_t ResultW

@@ -14,6 +14,9 @@ module LUTRAM #(
     parameter `STRING BACKEND = "behavioral",
 `else
     parameter `STRING BACKEND = "xilinx_xpm",
+    `ifndef ICS_WITH_XPM
+    `define ICS_WITH_XPM
+    `endif
 `endif
 
     parameter int NUM_BYTES = 64,  // 16, 32 or 64
